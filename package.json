@@ -14,12 +14,14 @@
     "quorum": "node bin/quorum.js"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.0",
     "@vitejs/plugin-react": "^5.1.1",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.468.0",
     "marked": "^16.4.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "tailwindcss": "^4.3.0",
     "vite": "^7.2.7"
   },
   "devDependencies": {

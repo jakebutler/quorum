@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import tailwindcss from "@tailwindcss/vite";
 import matter from "gray-matter";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
@@ -64,7 +65,7 @@ function quorumContent(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), quorumContent()],
+  plugins: [react(), tailwindcss(), quorumContent()],
   publicDir: "content",
   build: {
     outDir: "dist"
