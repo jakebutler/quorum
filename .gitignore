@@ -5,3 +5,4 @@ dist
 quorum-export.zip
 *.log
 .wrangler
+*.tsbuildinfo
