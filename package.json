@@ -1,0 +1,29 @@
+{
+  "name": "quorum",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "quorum": "./bin/quorum.js"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "quorum": "node bin/quorum.js"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "vite": "^7.2.7",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "lucide-react": "^0.468.0",
+    "gray-matter": "^4.0.3",
+    "marked": "^16.4.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "wrangler": "^4.54.0"
+  }
+}

@@ -1,0 +1,311 @@
+:root {
+  color: #17211c;
+  background: #f6f4ef;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  min-height: 44px;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 3px solid #277b5d;
+  outline-offset: 2px;
+}
+
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.review-frame {
+  width: min(1180px, 100%);
+  margin: auto;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.eyebrow,
+.progress {
+  color: #52675d;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(28px, 5vw, 48px);
+  line-height: 1.02;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+.copy-panel,
+.feedback,
+.ranking {
+  background: #fffefa;
+  border: 1px solid #dad6cc;
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(30, 36, 30, 0.08);
+}
+
+.copy-panel {
+  width: min(720px, 100%);
+  margin: 48px auto;
+  padding: clamp(24px, 6vw, 56px);
+}
+
+.markdown {
+  color: #26332d;
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.markdown h1 {
+  margin-bottom: 16px;
+}
+
+.identity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 24px 0;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: #2d3b34;
+  font-weight: 700;
+}
+
+label span {
+  color: #7d2e23;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #cfc9bc;
+  border-radius: 8px;
+  background: #fff;
+  color: #17211c;
+  padding: 12px 14px;
+}
+
+textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.primary,
+.secondary,
+.vote {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 12px 16px;
+  font-weight: 800;
+}
+
+.primary {
+  background: #1f6f52;
+  color: #fff;
+}
+
+.primary:disabled,
+.secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.secondary {
+  background: #fff;
+  color: #1f352b;
+  border-color: #cfc9bc;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+.artifact {
+  min-width: 0;
+}
+
+.artifact h2 {
+  margin-bottom: 10px;
+}
+
+.artifact iframe,
+.artifact img {
+  display: block;
+  width: 100%;
+  min-height: 620px;
+  max-height: 72dvh;
+  border: 1px solid #cfc9bc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.artifact img {
+  object-fit: contain;
+}
+
+.feedback,
+.ranking {
+  padding: 18px;
+}
+
+.vote-row,
+.nav-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.vote {
+  flex: 1;
+  color: #24352d;
+  background: #fff;
+  border-color: #cfc9bc;
+}
+
+.vote.active.up {
+  background: #e2f3ea;
+  border-color: #1f6f52;
+}
+
+.vote.active.down {
+  background: #fae9e4;
+  border-color: #9f3d2e;
+}
+
+.ranking {
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+
+.ranking-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.rank-card {
+  min-height: 128px;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 24px;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid #cfc9bc;
+  border-radius: 8px;
+  background: #fff;
+  color: #18231d;
+  padding: 12px;
+  font-weight: 800;
+}
+
+.rank-card.selected {
+  border-color: #1f6f52;
+  background: #edf8f1;
+}
+
+.rank-card img,
+.text-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #ede8db;
+  display: grid;
+  place-items: center;
+  color: #52675d;
+  font-size: 12px;
+  line-height: 1.2;
+  padding: 6px;
+}
+
+.error {
+  color: #842f24;
+  font-weight: 700;
+}
+
+footer {
+  margin-top: 24px;
+  text-align: center;
+  color: #52675d;
+  font-size: 14px;
+}
+
+footer a {
+  color: #1f6f52;
+  font-weight: 800;
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .topbar,
+  .review-grid,
+  .vote-row,
+  .nav-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .artifact iframe,
+  .artifact img {
+    min-height: 420px;
+  }
+}

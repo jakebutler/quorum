@@ -1,0 +1,11 @@
+{
+  "title": "Q1 landing page review",
+  "showRanking": true,
+  "maxRankingPicks": 3,
+  "collectName": "off",
+  "collectEmail": "off",
+  "showThumbnails": true,
+  "reviewsDir": "./content/reviews",
+  "hideBranding": false,
+  "unsafeAllowSameOrigin": false
+}
