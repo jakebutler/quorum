@@ -55,6 +55,7 @@ async function init(flags) {
     [
       `VITE_QUORUM_PROJECT_TOKEN=${provision.projectToken}`,
       "VITE_QUORUM_STORAGE_ADAPTER=corvo",
+      `VITE_QUORUM_TURNSTILE_SITE_KEY=${provision.turnstileSiteKey || ""}`,
       `QUORUM_DASHBOARD_URL=${provision.dashboardUrl}`,
       `QUORUM_NOTIFY_EMAIL=${notifyEmail}`
     ].join("\n") + "\n"

@@ -29,6 +29,7 @@ Secrets live in `.env.local`:
 ```bash
 VITE_QUORUM_PROJECT_TOKEN=qpt_...
 VITE_QUORUM_STORAGE_ADAPTER=corvo
+VITE_QUORUM_TURNSTILE_SITE_KEY=
 QUORUM_DASHBOARD_URL=https://quorum.corvolabs.com/dashboard/qrs_...
 QUORUM_NOTIFY_EMAIL=
 ```
