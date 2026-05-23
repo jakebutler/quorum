@@ -49,8 +49,8 @@ export class LocalBrowserAdapter implements StorageAdapter {
   }
 }
 
-function upsert(key: string, match: (row: any) => boolean, row: unknown) {
-  const rows = JSON.parse(localStorage.getItem(key) || "[]");
+function upsert(key: string, match: (row: Record<string, unknown>) => boolean, row: Record<string, unknown>) {
+  const rows = JSON.parse(localStorage.getItem(key) || "[]") as Record<string, unknown>[];
   const index = rows.findIndex(match);
   if (index >= 0) rows[index] = { ...rows[index], ...row };
   else rows.push(row);
