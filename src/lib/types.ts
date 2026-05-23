@@ -24,7 +24,7 @@ export interface ReviewOption {
 }
 
 export interface StorageAdapter {
-  createSession(input: { projectToken: string; anonymousId: string; name?: string; email?: string }): Promise<{ sessionId: string }>;
+  createSession(input: { projectToken: string; anonymousId: string; name?: string; email?: string; turnstileToken?: string }): Promise<{ sessionId: string }>;
   saveResponse(input: { sessionId: string; optionId: string; vote?: Vote; note?: string }): Promise<void>;
   saveRanking(input: { sessionId: string; picks: string[]; overallNote?: string }): Promise<void>;
   completeSession(sessionId: string): Promise<void>;

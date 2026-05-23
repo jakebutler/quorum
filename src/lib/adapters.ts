@@ -1,4 +1,5 @@
 import type { StorageAdapter } from "./types";
+import { localAdapterBase } from "./env";
 
 const apiBase = "https://quorum.corvolabs.com";
 
@@ -16,7 +17,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 }
 
 export class CorvoCloudAdapter implements StorageAdapter {
-  async createSession(input: { projectToken: string; anonymousId: string; name?: string; email?: string }) {
+  async createSession(input: { projectToken: string; anonymousId: string; name?: string; email?: string; turnstileToken?: string }) {
     return post<{ sessionId: string }>("/api/sessions", input);
   }
   async saveResponse(input: { sessionId: string; optionId: string; vote?: "up" | "down"; note?: string }) {
@@ -30,29 +31,30 @@ export class CorvoCloudAdapter implements StorageAdapter {
   }
 }
 
-export class LocalBrowserAdapter implements StorageAdapter {
-  async createSession(input: { projectToken: string; anonymousId: string; name?: string; email?: string }) {
-    const sessionId = `local_${crypto.randomUUID()}`;
-    const sessions = JSON.parse(localStorage.getItem("quorum_local_sessions") || "[]");
-    sessions.push({ id: sessionId, ...input, startedAt: Date.now() });
-    localStorage.setItem("quorum_local_sessions", JSON.stringify(sessions));
-    return { sessionId };
+export class LocalSqliteAdapter implements StorageAdapter {
+  async createSession(input: { projectToken: string; anonymousId: string; name?: string; email?: string; turnstileToken?: string }) {
+    return localPost<{ sessionId: string }>("/api/sessions", input);
   }
   async saveResponse(input: { sessionId: string; optionId: string; vote?: "up" | "down"; note?: string }) {
-    upsert("quorum_local_responses", (row) => row.sessionId === input.sessionId && row.optionId === input.optionId, { ...input, updatedAt: Date.now() });
+    await localPost("/api/responses", input);
   }
   async saveRanking(input: { sessionId: string; picks: string[]; overallNote?: string }) {
-    upsert("quorum_local_rankings", (row) => row.sessionId === input.sessionId, { ...input, updatedAt: Date.now() });
+    await localPost("/api/rankings", input);
   }
   async completeSession(sessionId: string) {
-    upsert("quorum_local_completions", (row) => row.sessionId === sessionId, { sessionId, completedAt: Date.now() });
+    await localPost("/api/complete", { sessionId });
   }
 }
 
-function upsert(key: string, match: (row: Record<string, unknown>) => boolean, row: Record<string, unknown>) {
-  const rows = JSON.parse(localStorage.getItem(key) || "[]") as Record<string, unknown>[];
-  const index = rows.findIndex(match);
-  if (index >= 0) rows[index] = { ...rows[index], ...row };
-  else rows.push(row);
-  localStorage.setItem(key, JSON.stringify(rows));
+async function localPost<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${localAdapterBase}${path}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Local SQLite request failed with ${response.status}`);
+  }
+  return response.json() as Promise<T>;
 }

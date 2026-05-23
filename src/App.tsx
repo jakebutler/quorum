@@ -1,11 +1,21 @@
 import { ArrowLeft, ArrowRight, Check, Download, ThumbsDown, ThumbsUp } from "lucide-react";
 import { marked } from "marked";
 import { quorumContent } from "virtual:quorum-content";
-import { CorvoCloudAdapter, LocalBrowserAdapter } from "./lib/adapters";
+import { CorvoCloudAdapter, LocalSqliteAdapter } from "./lib/adapters";
 import { getAnonymousId } from "./lib/identity";
-import { projectToken, storageAdapterName } from "./lib/env";
+import { projectToken, storageAdapterName, turnstileSiteKey } from "./lib/env";
 import type { QuorumConfig, ReviewOption, Vote } from "./lib/types";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (element: HTMLElement, options: { sitekey: string; size: "invisible"; callback: (token: string) => void; "error-callback": () => void }) => string;
+      execute: (widgetId: string) => void;
+      reset: (widgetId: string) => void;
+    };
+  }
+}
 
 const defaults: QuorumConfig = {
   title: "Quorum review",
@@ -24,7 +34,7 @@ type Step = "welcome" | "review" | "ranking" | "thanks";
 export function App() {
   const config = { ...defaults, ...quorumContent.config };
   const reviews = quorumContent.reviews;
-  const adapter = useMemo(() => storageAdapterName === "local-sqlite" ? new LocalBrowserAdapter() : new CorvoCloudAdapter(), []);
+  const adapter = useMemo(() => storageAdapterName === "local-sqlite" ? new LocalSqliteAdapter() : new CorvoCloudAdapter(), []);
   const [step, setStep] = useState<Step>("welcome");
   const [sessionId, setSessionId] = useState("");
   const [index, setIndex] = useState(0);
@@ -34,16 +44,45 @@ export function App() {
   const [overallNote, setOverallNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const turnstileContainer = useRef<HTMLDivElement | null>(null);
+  const turnstileWidget = useRef<string | null>(null);
+  const turnstileResolver = useRef<((token: string) => void) | null>(null);
 
   const canStart = modeOk(config.collectName, identity.name) && modeOk(config.collectEmail, identity.email);
   const current = reviews[index];
+
+  useEffect(() => {
+    if (!turnstileSiteKey || !turnstileContainer.current) return;
+    const render = () => {
+      if (!window.turnstile || !turnstileContainer.current || turnstileWidget.current) return;
+      turnstileWidget.current = window.turnstile.render(turnstileContainer.current, {
+        sitekey: turnstileSiteKey,
+        size: "invisible",
+        callback: (token) => turnstileResolver.current?.(token),
+        "error-callback": () => {
+          setError("Captcha verification failed. Try again.");
+          turnstileResolver.current?.("");
+        }
+      });
+    };
+    if (window.turnstile) render();
+    else {
+      const script = document.createElement("script");
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+      script.async = true;
+      script.defer = true;
+      script.onload = render;
+      document.head.appendChild(script);
+    }
+  }, []);
 
   async function start() {
     setBusy(true);
     setError("");
     try {
       const token = projectToken || "local-preview-token";
-      const session = await adapter.createSession({ projectToken: token, anonymousId: getAnonymousId(), ...identity });
+      const turnstileToken = await executeTurnstile();
+      const session = await adapter.createSession({ projectToken: token, anonymousId: getAnonymousId(), turnstileToken, ...identity });
       setSessionId(session.sessionId);
       setStep(reviews.length ? "review" : "thanks");
     } catch (err) {
@@ -51,6 +90,32 @@ export function App() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function executeTurnstile() {
+    if (!turnstileSiteKey) return Promise.resolve("");
+    return new Promise<string>((resolve, reject) => {
+      if (!window.turnstile || !turnstileWidget.current) {
+        reject(new Error("Captcha is not ready. Try again."));
+        return;
+      }
+      let settled = false;
+      turnstileResolver.current = (token) => {
+        if (settled) return;
+        settled = true;
+        turnstileResolver.current = null;
+        if (token) resolve(token);
+        else reject(new Error("Captcha verification failed. Try again."));
+      };
+      window.turnstile.reset(turnstileWidget.current);
+      window.turnstile.execute(turnstileWidget.current);
+      window.setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        turnstileResolver.current = null;
+        reject(new Error("Captcha verification timed out. Try again."));
+      }, 8000);
+    });
   }
 
   async function save(option: ReviewOption, next: { vote?: Vote; note?: string }) {
@@ -88,6 +153,7 @@ export function App() {
           <div className="copy-panel">
             <Markdown source={quorumContent.welcome} />
             <IdentityFields config={config} identity={identity} onChange={setIdentity} />
+            {turnstileSiteKey && <div ref={turnstileContainer} />}
             {error && <p className="error">{error}</p>}
             <button className="primary" disabled={!canStart || busy} onClick={start}>
               {busy ? "Starting..." : config.welcome?.cta || "Start Reviewing"}

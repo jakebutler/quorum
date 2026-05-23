@@ -45,6 +45,23 @@ npx quorum dashboard
 
 The dashboard URL includes the retrieval secret and is shown once during provisioning. Store it like a password.
 
+## Local SQLite
+
+For self-hosted local collection, set:
+
+```bash
+VITE_QUORUM_STORAGE_ADAPTER=local-sqlite
+QUORUM_SQLITE_PATH=.quorum/quorum.sqlite
+```
+
+Then run `npx quorum dev`. The CLI starts Vite plus a localhost SQLite adapter at `http://127.0.0.1:8789`. Export the local database with:
+
+```bash
+npx quorum export
+```
+
+This writes `quorum-export.zip` containing `summary.csv`, `sessions.csv`, `votes.csv`, and `rankings.csv`.
+
 ## License
 
 MIT
